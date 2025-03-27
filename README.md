@@ -2,6 +2,9 @@
 📌 Overview
 The Senior-Junior Interaction Project is a platform designed to bridge the gap between senior and junior students. It enables mentorship, networking, and knowledge sharing through various features like messaging, forums, and event management.
 
+# Wireframes
+https://app.eraser.io/workspace/up9UcmRdIJvJq5HEkalT
+
 🚀 Features
 - User Authentication & Authorization (JWT-based)
 - Profile Management (Create, update, and view profiles)
