@@ -1,50 +1,77 @@
 import React, { useState } from "react";
-import "../components/LoginCSS/LoginPage.css"; // Import the styles
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const LoginForm = () => {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth(); // ✅ Get setIsAuthenticated from context
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here (e.g., API call)
-    console.log("Logging in with:", { email, password });
+    const { email, password } = formData;
+
+    if (!email || !password) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", result.token);
+        setIsAuthenticated(true); // ✅ Update auth status
+        navigate("/start");
+      } else {
+        toast.error(result.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
     <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="logo-container">
-          <img src="/node-white.png" alt="Campus Node Logo" className="logo" />
-        </div>
-        
+      <form className="login-form" onSubmit={handleSubmit}>
         <h2>Login</h2>
-        <label htmlFor="email">Email</label>
+        <label>Email:</label>
         <input
           type="email"
-          id="email"
           name="email"
+          value={formData.email}
+          onChange={handleChange}
           required
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
         />
-        <label htmlFor="password">Password</label>
+        <label>Password:</label>
         <input
           type="password"
-          id="password"
           name="password"
+          value={formData.password}
+          onChange={handleChange}
           required
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
         />
         <button type="submit" className="login-button">
           Login
         </button>
+        <ToastContainer />
       </form>
     </div>
   );
 };
 
-export default LoginPage;
+export default LoginForm;

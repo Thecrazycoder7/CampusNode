@@ -1,11 +1,14 @@
 const Joi = require('joi');
 
+// Signup Validation Middleware
+
 const  signupValidation = (req, res, next) => {
     const schema = Joi.object({
       name: Joi.string().min(3).max(100).required(),
-      college: Joi.string().min(3).max(100).required(),
-      year: Joi.string().required(),
       email: Joi.string().email().required(),
+      year: Joi.string().required(),
+      branch: Joi.string().required(),
+      college: Joi.string().min(3).max(100).required(),
       password: Joi.string()
         .min(6)
         .max(100)
@@ -21,6 +24,7 @@ const  signupValidation = (req, res, next) => {
     next();
 }
 
+// Login Validation Middleware
 const  loginValidation = (req, res, next) => {
     const schema = Joi.object({
         email: Joi.string().email().required(),
@@ -36,6 +40,6 @@ const  loginValidation = (req, res, next) => {
 }
 
 module.exports = {
-    signupValidation,
-    loginValidation
-}
+  signupValidation,
+  loginValidation
+};

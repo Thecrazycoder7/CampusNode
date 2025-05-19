@@ -23,10 +23,20 @@
 }
 
 .logo {
-  width: 150px; /* Adjust the width of the logo */
+  width: 120px; /* Adjust the width of the logo */
   height: auto;
   display: block;
   margin: 0 auto; /* Center the logo horizontally */
+}
+
+/* Form labels */
+label {
+  float: left;
+  font-weight: 500;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 14px;
 }
 
 /* Form inputs */
@@ -39,7 +49,7 @@ input {
 }
 
 /* Button */
-.login-button {
+button {
   width: 100%;
   padding: 10px;
   background-color: #004aad;
@@ -48,9 +58,18 @@ input {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 20px;
+  margin-top: 20px; /* Margin on top */
+  display: block; /* Ensures the button behaves like a block-level element */
 }
 
-.login-button:hover {
+button:hover {
   background-color: #003a8c;
+}
+
+/* Responsive styling for small screens */
+@media (max-width: 400px) {
+  .login-form {
+    width: 90%;
+    padding: 15px;
+  }
 }

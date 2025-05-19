@@ -1,17 +1,21 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom"; // Import Link for navigation
 import "../components/LoginCSS/RegistrationForm.css"; // Import the styles
+import { handleError, handleSuccess } from "../util.jsx";
+import { ToastContainer } from "react-toastify";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    yearOfPassing: "",
+    year: "",
     branch: "",
     college: "",
     password: "",
   });
 
+  // for navigate to next page
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -20,11 +24,39 @@ const RegistrationForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic (e.g., API call or form validation)
-    console.log("Form Submitted:", formData);
+    const { name, email, year, branch, college, password } = formData;
+
+    if (!name || !email || !year || !branch || !college || !password) {
+      return handleError("All fields are required");
+    }
+
+    try {
+      const url = "http://localhost:8080/auth/signup";
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      console.log("Response from backend:", result); // Log full response
+      const { success, message } = result;
+      if (success) {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        handleError(message); // Handle errors more clearly
+      }
+    } catch (error) {
+      console.error("Request failed:", error); // Log fetch errors for debugging
+    }
   };
+  
 
   return (
     <div className="registration-container">
@@ -62,11 +94,11 @@ const RegistrationForm = () => {
               <label htmlFor="yearOfPassing">Year of Passing</label>
               <input
                 type="text"
-                id="yearOfPassing"
-                name="yearOfPassing"
+                id="year"
+                name="year"
                 required
                 placeholder="Enter your year of passing"
-                value={formData.yearOfPassing}
+                value={formData.year}
                 onChange={handleChange}
               />
             </div>
@@ -112,14 +144,17 @@ const RegistrationForm = () => {
               Register
             </button>
           </div>
-        </form>
 
-        {/* Add a link for users who already have an account */}
-        <div className="login-link">
-          <p>
-            Already have an account? <Link to="/login">Login here</Link>
-          </p>
-        </div>
+          {/* Add a link for users who already have an account */}
+          <div className="login-link">
+            <p>
+              Already have an account? <Link to="/login">Login here</Link>
+            </p>
+          </div>
+        </form>
+        
+        <ToastContainer />
+        
       </div>
     </div>
   );
