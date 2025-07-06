@@ -14,6 +14,10 @@ const  signupValidation = (req, res, next) => {
         .max(100)
         .pattern(new RegExp("^[a-zA-Z0-9]{6,30}$"))
         .required(),
+      linkedin: Joi.string().uri().required(),
+      github: Joi.string().uri().required(),
+      about: Joi.string().required(),
+      skills: Joi.array().items(Joi.string()).required(),
     });
 
     const {error} = schema.validate(req.body);

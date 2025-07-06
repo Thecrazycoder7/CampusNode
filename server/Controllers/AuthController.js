@@ -1,21 +1,42 @@
 const bcrypt = require("bcrypt");
-const UserModel = require("../models/User.js");
+const UserModel = require("../Models/User.js");
 const jwt = require("jsonwebtoken");
-
-// Function to generate token
-const generateToken = (user) => {
-  return jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" } // Token expires in 1 hour
-  );
-};
 
 const signup = async (req, res) => {
   try {
-    const { name, college, year, branch, email, password } = req.body;
+    const {
+      name,
+      college,
+      year,
+      branch,
+      email,
+      password,
+      linkedin,
+      github,
+      about,
+      skills,
+    } = req.body;
     const existingUser = await UserModel.findOne({ email });
 
+    // Check for missing fields
+
+    if (
+      !name ||
+      !college ||
+      !year ||
+      !branch ||
+      !email ||
+      !password ||
+      !linkedin ||
+      !github ||
+      !about ||
+      !skills
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+        success: false,
+      });
+    }
     if (existingUser) {
       return res.status(409).json({
         message: "User already exists, please login",
@@ -32,6 +53,10 @@ const signup = async (req, res) => {
       branch,
       college,
       password: hashedPassword,
+      linkedin,
+      github,
+      about,
+      skills,
     });
 
     await userModel.save();
@@ -50,6 +75,8 @@ const signup = async (req, res) => {
   }
 };
 
+// Inside your AuthController.js (or wherever your login function is)
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -60,29 +87,56 @@ const login = async (req, res) => {
       return res.status(403).json({ message: errorMsg, success: false });
     }
 
-    // Compare password hash
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(403).json({ message: errorMsg, success: false });
     }
 
-    // Generate token using the correct user object
-    const token = generateToken(user);
+    const token = jwt.sign(
+      { _id: user._id, email: user.email }, // Using _id from Mongoose user object
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    // Send the response with the generated token
+    // --- CRITICAL CHANGE HERE ---
+    // Destructure the user properties you want to send to the frontend
+    // Or, better yet, send the whole user object if it's not too sensitive
+    const { _id, name, branch, college, year, linkedin, github, about, skills, isVerified } = user;
+
+    // Send the response with the generated token AND the complete user object
     res.status(200).json({
       message: "Login successful",
       success: true,
       token,
-      name: user.name,
-      email: user.email,
+      user: {
+        // <-- NEST THE USER DETAILS HERE
+        _id,
+        name,
+        email: user.email, // Use user.email as it was part of original query
+        branch,
+        college,
+        year,
+        linkedin,
+        github,
+        about,
+        skills,
+        isVerified: user.isVerified || false,
+      },
     });
+    // --- END CRITICAL CHANGE ---
+
   } catch (error) {
+    console.error("Error during login:", error.message); // Added for better server-side debugging
     res.status(500).json({
       message: "Internal server error",
       success: false,
     });
   }
+};
+
+module.exports = {
+  signup,
+  login
 };
 
 module.exports = {

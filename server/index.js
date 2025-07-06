@@ -1,21 +1,40 @@
 const express = require("express");
-const app = express();
-const AuthRouter = require('./Routes/AuthRouter');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const userRouter = require("./Routes/UserRouter");  
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 
-require('dotenv').config();
-require('./Models/db');
+const authRoutes = require("./Routes/AuthRouter.js");
+const postRoutes = require("./Routes/PostRouter.js");
+const messageRoutes = require("./Routes/MessageRouter.js");
+const { handleSocketConnection } = require("./socket.js"); // 👈 central socket logic
+const connectDB = require("./Models/db.js");
+
+dotenv.config();
+connectDB();
+
+const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+
+// 👇 pass io to handler
+handleSocketConnection(io);
+
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(bodyParser.json());
+
+app.use("/auth", authRoutes);
+app.use("/posts", postRoutes);
+app.use("/messages", messageRoutes);
 
 const PORT = process.env.PORT || 8000;
-
-app.use(bodyParser.json());
-app.use(cors());
-
-app.use('/auth', AuthRouter);
-app.use("/auth", userRouter);
-
-app.listen(PORT, ()  =>{
-    console.log(`Server running on port ${PORT}`);
-})
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

@@ -1,37 +1,31 @@
-// App.js
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {AuthProvider , useAuth } from "./AuthContext";
-import RegistrationForm from "./components/RegistrationForm";
-import LoginForm from "./components/LoginPage";
-import HomePage from "./components/Pages/HomePage";
-import WelcomePage from "./components/Pages/WelcomePage";
-import RefreshHandler from "./RefreshHandler";
-import "./App.css";
-import { Navigate } from "react-router-dom";
-
-const PrivateRoute = ({ element }) => {
-  const { isAuthenticated } = useAuth(); // Use the custom hook
-  return isAuthenticated ? element : <Navigate to="/login" />;
-};
+import RegistrationForm from "./components/LogPage/RegistrationForm.jsx";
+import LoginForm from "./components/LogPage/LoginPage";
+import LandingPage from "./components/Pages/LandingPage.jsx";
+import Layout from "./components/Pages/Layout.jsx";
+import Home from "./components/NavPage/Home.jsx";
+import Chats from "./components/NavPage/Chats.jsx"
+import Profile from "./components/NavPage/Profile.jsx";
+import Resources from "./components/NavPage/Resources.jsx";
+import ForumBoards from "./components/NavPage/forumBoards.jsx";
 
 function App() {
   return (
     <div className="w-100">
-      <AuthProvider>
-        <Router>
-          <RefreshHandler />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/register" element={<RegistrationForm />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route
-              path="/start"
-              element={<PrivateRoute element={<WelcomePage />} />}
-            />
-          </Routes>
-        </Router>
-      </AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="signup" element={<RegistrationForm />} />
+          <Route path="login" element={<LoginForm />} />
+          <Route path="/start" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="chats" element={<Chats />} />
+            <Route path="forumboards" element={<ForumBoards />} />
+            <Route path="resources" element={<Resources />} />
+          </Route>
+        </Routes>
+      </Router>
     </div>
   );
 }

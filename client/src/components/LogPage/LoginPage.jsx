@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../AuthContext";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./LoginPage.css";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth(); // ✅ Get setIsAuthenticated from context
+  const { login, isLoggingIn } = useAuthStore();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,38 +17,24 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = formData;
-
-    if (!email || !password) {
-      toast.error("Please fill all fields");
+    if (!formData.email || !formData.password) {
+      toast.error("Please enter both email and password.");
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("token", result.token);
-        setIsAuthenticated(true); // ✅ Update auth status
-        navigate("/start");
-      } else {
-        toast.error(result.message || "Login failed");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Something went wrong");
-    }
+    const result = await login(formData);
+    if (result?.success) navigate("/start");
   };
 
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
+        <img
+          src="/node-white.png"
+          alt="CampusNode Logo"
+          className="mb-3 mx-auto"
+          style={{ width: "150px", objectFit: "contain" }}
+        />
         <h2>Login</h2>
         <label>Email:</label>
         <input
@@ -65,11 +52,15 @@ const LoginForm = () => {
           onChange={handleChange}
           required
         />
+        <br />
         <button type="submit" className="login-button">
-          Login
+          {isLoggingIn ? "Logging in..." : "Login"}
         </button>
-        <ToastContainer />
+        <span>
+          Don't have an account? <Link to="/signup">Signup</Link>
+        </span>
       </form>
+      <ToastContainer />
     </div>
   );
 };

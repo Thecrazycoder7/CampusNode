@@ -1,16 +1,20 @@
 const jwt = require("jsonwebtoken");
 const ensureAuthentication = (req, res, next) => {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+  const auth = req.headers["authorization"];
+  if (!auth) {
+    return res
+      .status(403)
+      .json({ message: "Unauthorized, JWT token is require" });
+  }
 
-    if (!token)
-      return res.status(401).json({ success: false, message: "No token" });
+    try {
+      const decoded = jwt.verify(auth, process.env.JWT_SECRET); 
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid token" });
-      }
-      req.user = user; // Attach user info to request object
-      next();    
-  })
+        req.user = decoded.id; // Attach user info to request object
+        next();   
+    } catch (err) {
+      return res.status(403)
+            .json({ message: 'Unauthorized, JWT token wrong or expired' });
+    }
 }
 module.exports = ensureAuthentication;

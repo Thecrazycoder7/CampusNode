@@ -1,0 +1,55 @@
+/* App.css */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+  
+  /* Custom hover effect for cards */
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Animation for resource cards */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Apply animation to each card */
+  .row > .col {
+    animation: fadeIn 0.5s ease-in forwards;
+    opacity: 0;
+  }
+  
+  /* Set individual delays for each card */
+  .row > .col:nth-child(1) { animation-delay: 0.1s; }
+  .row > .col:nth-child(2) { animation-delay: 0.2s; }
+  .row > .col:nth-child(3) { animation-delay: 0.3s; }
+  .row > .col:nth-child(4) { animation-delay: 0.4s; }
+  .row > .col:nth-child(5) { animation-delay: 0.5s; }
+  .row > .col:nth-child(6) { animation-delay: 0.6s; }
+  .row > .col:nth-child(7) { animation-delay: 0.7s; }
+  .row > .col:nth-child(8) { animation-delay: 0.8s; }
+  .row > .col:nth-child(9) { animation-delay: 0.9s; }
+  .row > .col:nth-child(10) { animation-delay: 1.0s; }
+  .row > .col:nth-child(11) { animation-delay: 1.1s; }
+  .row > .col:nth-child(12) { animation-delay: 1.2s; }
+  
+  /* Custom cursor for clickable cards */
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  /* Custom transition for hover shadow */
+  .hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  /* Smooth transition for all properties */
+  .transition-all {
+    transition: all 0.2s ease;
+  }
+  
