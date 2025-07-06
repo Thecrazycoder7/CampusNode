@@ -15,7 +15,7 @@ export const useChatStore = create((set) => ({
     try {
       const authUser = useAuthStore.getState().authUser; 
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/messages/users", {
+      const response = await fetch(process.env.uri, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
